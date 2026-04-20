@@ -123,4 +123,4 @@ Replace it with your desired key combination.
 ## Acknowledgments
 - Built using PyObjC for macOS UI  
 - Uses OpenAI for language model interaction  
-- Inspired by Raycast’s workflow and speed-focused design  
+- Inspired by Raycast’s workflow
