@@ -70,7 +70,7 @@ class Overlay(NSObject):
         self.window.setHidesOnDeactivate_(False)                                                 # Don’t auto-hide when app loses active status
         self.window.setOpaque_(True)                                                             # Opaque background (simpler compositing)
         self.window.setBackgroundColor_(NSColor.windowBackgroundColor())                         # Standard macOS window background color
-        self.window.setTitle_("SnapPrompt")                                                      # Titlebar text for the overlay window
+        self.window.setTitle_("Open Search")                                                     # Titlebar text for the overlay window
         self._toggle_debounce_s = 0.22                                                           # Ignore rapid duplicate hotkey toggles
         self._last_toggle_mono = 0.0                                                             # Last toggle time (monotonic clock)
         self._worker_queue = NSOperationQueue.alloc().init()                                     # Background queue for network/OpenAI work

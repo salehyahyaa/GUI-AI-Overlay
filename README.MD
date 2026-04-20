@@ -42,6 +42,7 @@ GUI-AI-Overlay/
 ├── README.md
 ├── LICENSE
 ├── requirements.txt
+├── .env
 ```
 
 
