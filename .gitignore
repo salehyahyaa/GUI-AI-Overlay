@@ -47,4 +47,6 @@ htmlcov/
 venv/
 
 #Docs
+docs/
+.docs/
 challenges.txt
