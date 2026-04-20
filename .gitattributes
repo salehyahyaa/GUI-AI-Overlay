@@ -1,0 +1,42 @@
+# Normalize line endings
+* text=auto
+
+# Explicit LF for source code
+*.py text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files (no diff / no merge)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.mp3 binary
+*.mp4 binary
+*.wav binary
+
+# Model / AI artifacts (treat as binary)
+*.pt binary
+*.pth binary
+*.onnx binary
+*.h5 binary
+*.ckpt binary
+
+# Prevent large noise in diffs
+*.log -diff
+*.sqlite3 -diff
+
+# Optional: make README diff nicer
+*.md diff=markdown

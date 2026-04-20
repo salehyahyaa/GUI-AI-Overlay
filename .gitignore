@@ -45,3 +45,6 @@ htmlcov/
 # Databases
 *.sqlite3.env
 venv/
+
+#Docs
+challenges.txt
