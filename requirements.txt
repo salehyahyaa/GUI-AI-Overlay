@@ -1,0 +1,5 @@
+pynput==1.8.1               #hotkey listener
+openai==2.32.0              #LLM
+python-dotenv==1.2.2
+pyperclip==1.11.0           #to copy and paste text
+pyobjc==12.1                #to create the overlay window
