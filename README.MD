@@ -4,9 +4,7 @@ Racycast inspired macOS overlay triggered by global hotkey that provides an inst
 
 
 ## Motivation
-Over the years I noticed the keyboard is in most cases faster than a mouse. I found it repetitive to need to exit out a tab to search something or even ask AI.  
-
-Now instead of using your mouse to enter a new tab or switch windows, this process is much more snappier. By pressing <cmd+shift+space>, the GUI pops up where you can paste or type a prompt and immediately get a response. You can copy it and press <cmd+w> to close it, all without breaking your flow.  
+Over the years I noticed the keyboard is in most cases faster than a mouse. I found it repetitive to need to exit out a tab to search something or even ask AI. Now instead of using your mouse to enter a new tab or switch windows, this process is much more snappier. By pressing <cmd+shift+space>, the GUI pops up where you can paste or type a prompt and immediately get a response. You can copy it and press <cmd+w> to close it, all without breaking your flow.  
 
 
 ## IMPORTANT
