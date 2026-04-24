@@ -9,7 +9,9 @@ client = OpenAI(api_key=_api_key)
 
 def get_response(prompt):
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
+        model="gpt-5.4-mini",
+        messages=messages,
+        stream=True,
+        reasoning_effort="low",
     )
     return response.choices[0].message.content
