@@ -8,10 +8,16 @@ _api_key = os.getenv("OPENAI_API_KEY") or os.getenv("OPEN_AI_API_KEY")
 client = OpenAI(api_key=_api_key)
 
 def get_response(prompt):
-    response = client.chat.completions.create(
-        model="gpt-5.4-mini",
-        messages=messages,
+    """Yield response chunks as they stream in from the model."""
+    stream = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
         stream=True,
-        reasoning_effort="low",
     )
-    return response.choices[0].message.content
+    try:
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+    finally:
+        stream.close()

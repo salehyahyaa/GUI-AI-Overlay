@@ -99,6 +99,11 @@ class Overlay(NSObject):
         self.output_view.setRichText_(False)                                                      # Plain text: predictable copy/paste behavior
         self.output_view.setImportsGraphics_(False)                                               # Don’t treat drops as images in read-only view
         self.output_view.setFont_(NSFont.systemFontOfSize_(13))                                  # Readable default system font size
+        self.output_view.setDrawsBackground_(True)                                               # Draw our own bg so white text is readable
+        self.output_view.setBackgroundColor_(NSColor.blackColor())                               # Dark backdrop behind streamed response
+        self.output_view.setTextColor_(NSColor.whiteColor())                                     # Default foreground for response text
+        self.output_view.setInsertionPointColor_(NSColor.whiteColor())                           # Match caret color (visible if ever editable)
+        self.output_view.setTypingAttributes_({"NSColor": NSColor.whiteColor()})                 # Future-inserted runs inherit white color
         self.output_view.setString_("")                                                          # Start empty before first response
         scroll.setDocumentView_(self.output_view)                                                # Attach text view as scroll view document
         self.input_field = NSTextField.alloc().initWithFrame_(NSMakeRect(8, 8, w - 100, 28))     # Single-line prompt input near bottom
@@ -142,28 +147,41 @@ class Overlay(NSObject):
         self.window.makeFirstResponder_(self.input_field)
 
     def _set_output(self, text):                                                                 # Central helper to replace output text
-        self.output_view.setString_(text)                                                        # Non-streaming: replace whole output string
-    
-    
+        self.output_view.setString_(text)                                                        # Replace whole output string (used for reset/errors)
+
+    def _append_output(self, text):                                                              # Append a streamed chunk without losing prior text
+        storage = self.output_view.textStorage()                                                 # Backing NSTextStorage for the text view
+        start = storage.length()                                                                 # Range start before append (for color attr)
+        storage.mutableString().appendString_(text)                                              # Append plain string preserving current typing attributes
+        length = storage.length()                                                                # New end-of-text index for autoscroll
+        storage.addAttribute_value_range_(                                                       # Force white on the just-appended run
+            "NSColor", NSColor.whiteColor(), (start, length - start)
+        )
+        self.output_view.scrollRangeToVisible_((length, 0))                                      # Keep latest tokens visible as they arrive
+
+
     def send_(self, sender):                                                                     # Button action (`send:` → `send_` in PyObjC)
         prompt = self.input_field.stringValue().strip()                                          # Read prompt; strip whitespace
         if not prompt:                                                                           # Guard empty submits
             return                                                                                # No API call for empty string
-        self._set_output("…")                                                                     # Small loading indicator before response
+        self._set_output("")                                                                      # Clear output before streaming new tokens in
         self.send_button.setEnabled_(False)                                                      # Prevent double-submit while in flight
-       
-       
+
+
         def work():                                                                              # Runs on background queue
             try:                                                                                  # Keep failures from crashing UI thread
-                text = get_response(prompt)                                                       # Blocking OpenAI call (off main thread)
+                for token in get_response(prompt):                                               # Iterate streamed chunks off the main thread
+                    chunk = token                                                                # Bind for the lambda closure below
+                    self._main_queue.addOperationWithBlock_(                                     # AppKit mutations must happen on main thread
+                        lambda c=chunk: self._append_output(c)
+                    )
             except Exception as e:                                                               # Network/SDK/config errors land here
-                text = f"Error: {e}"                                                              # User-visible error string
-            def apply():                                                                          # Runs on main queue for UI mutation
-                self._set_output(text)                                                            # Show model output or error in UI
-                self.send_button.setEnabled_(True)                                               # Re-enable submit after completion
+                err = f"Error: {e}"                                                               # User-visible error string
+                self._main_queue.addOperationWithBlock_(lambda: self._set_output(err))           # Replace partial output with error message
+            def done():                                                                           # Runs on main queue after stream finishes
+                self.send_button.setEnabled_(True)                                                # Re-enable submit after completion
                 self._focus_prompt()                                                              # Ready for next prompt without clicking
-
-            self._main_queue.addOperationWithBlock_(apply)                                        # AppKit updates must happen on main thread
+            self._main_queue.addOperationWithBlock_(done)                                        # Final UI cleanup on main thread
         self._worker_queue.addOperationWithBlock_(work)                                          # Don’t block the main event loop on HTTP
    
    
